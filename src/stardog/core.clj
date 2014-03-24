@@ -9,7 +9,7 @@
 
 (defn reasoning-type
   ^ReasoningType [r]
-  (let [t (str/lower-case (name r))]
+  (let [t (str/upper-case (name r))]
     (ReasoningType/valueOf t)))
 
 (defprotocol Connectable
