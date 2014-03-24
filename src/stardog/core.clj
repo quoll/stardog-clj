@@ -55,7 +55,7 @@
   TupleQueryResult
   (clojure-data* [results keyfn valfn] (key-map-results keyfn valfn results))
   Boolean
-  (clojure-data* [results _ valfn] (println "results") (println "  --> " results) (valfn results)))
+  (clojure-data* [results _ valfn] (valfn results)))
 
 (defn clojure-data
   "Converts query results into Clojure data. Optionally uses functions for interpreting
@@ -65,7 +65,6 @@
 
 (defn execute* [^Query q {:keys [key-converter converter]
                          :or {key-converter keyword converter identity}}]
-  (println "Executing: " q)
   (clojure-data (.execute q) key-converter converter))
 
 (defn configure-query
@@ -205,4 +204,22 @@
          (catch Throwable t#
            ~@rollbacks
            (throw t#))))))
+
+(defmacro with-connection-tx
+  "(with-connection binding-forms body)
+   Establishes a connection and a transaction to execute the body within."
+  [bindings & body]
+  (assert-args
+    (vector? bindings) "a vector for its binding"
+    (even? (count bindings)) "an even number of forms in binding vector")
+  (cond
+    (empty? bindings) `(do ~@body)
+    (symbol? (bindings 0)) `(let ~(subvec bindings 0 2)
+                              (try
+                                (with-transaction [~(bindings 0)]
+                                  (with-connection-tx ~(subvec bindings 2) ~@body))
+                                (finally
+                                  (.close ~(bindings 0)))))
+    :else (throw (IllegalArgumentException.
+                   "with-connection-tx only allows Symbols in bindings"))))
 
