@@ -31,6 +31,17 @@ There are wrappers for:
 Most query options are available for configuring as keys in the parameter map. When requesting
 reasoners, use strings or keywords.
 
+### Query Results
+
+Results from SPARQL queries are lazy sequences of bindings from variable names to values.
+By default, variable names are converted to keywords, and values are left untouched. This can
+be changed by providing functions for the :key-converter and :converter parameters.
+
+Graph results are the same as query results, with namespaces attached as metadata on the entire
+sequence (not on sub-sequences).
+
+### Transactions
+
 While there are no update api wrappers yet, there is a macro for dealing with transactions:
 
 ```
