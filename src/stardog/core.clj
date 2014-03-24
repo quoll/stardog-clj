@@ -1,10 +1,12 @@
 (ns stardog.core
-  (:require [clojure.string :as str])
+  (:require [clojure.string :as str]
+            [stardog.values :as values])
   (:import [clojure.lang IFn]
            [java.util Map]
            [com.complexible.stardog.api ConnectionConfiguration Connection Query ReadQuery]
            [com.complexible.stardog.reasoning.api ReasoningType]
            [org.openrdf.query TupleQueryResult GraphQueryResult BindingSet Binding]
+           [org.openrdf.model URI Literal BNode]
            [info.aduna.iteration Iteration]))
 
 (defn reasoning-type
@@ -60,11 +62,11 @@
 (defn clojure-data
   "Converts query results into Clojure data. Optionally uses functions for interpreting
    names and value bindings in results."
-  ([results] (clojure-data* results keyword identity))
+  ([results] (clojure-data* results keyword values/standardize))
   ([results keyfn valfn] (clojure-data* results keyfn valfn)))
 
 (defn execute* [^Query q {:keys [key-converter converter]
-                         :or {key-converter keyword converter identity}}]
+                         :or {key-converter keyword converter values/standardize}}]
   (clojure-data (.execute q) key-converter converter))
 
 (defn configure-query
