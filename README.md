@@ -56,6 +56,6 @@ While there are no update api wrappers yet, there is a macro for dealing with tr
 
 ## License
 
-Copyright © 2014 Paul Gearon
+Copyright © 2014 Paula Gearon
 
 Distributed under the Eclipse Public License 1.0, the same as Clojure.
